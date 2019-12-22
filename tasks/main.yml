@@ -1,0 +1,50 @@
+# Standards: 0.1
+---
+- name: Fact iterm2 user
+  set_fact:
+    iterm_user: "{{ iterm_user | default(homebrew_user) | default(ansible_user_id) }}"
+  tags:
+    - iterm2
+
+- name: Install psutil package
+  pip:
+    name: psutil
+  tags:
+    - iterm2
+
+- become: "{{ (iterm_user != ansible_user_id) | bool }}"
+  become_user: "{{ iterm_user }}"
+  block:
+    - name: Install required package
+      ignore_errors: True
+      homebrew_cask:
+        name: iterm2
+        greedy: True
+        options: appdir=/Applications
+        accept_external_apps: False
+        state: upgraded
+      tags:
+        - iterm2
+
+    - name: Remove quarantine flag
+      register: iterm_quarantine
+      failed_when: iterm_quarantine.rc != 0 and "No such xattr" not in iterm_quarantine.stderr
+      changed_when: iterm_quarantine.rc == 0
+      command: xattr -d com.apple.quarantine /Applications/iTerm.app
+      tags:
+        - iterm2
+
+    - name: Check program running
+      register: iterm_running
+      pids:
+        name: iTerm
+      tags:
+        - iterm2
+
+    - name: Fact program running
+      set_fact:
+        iterm_started: "{{ iterm_running.pids | length > 0 }}}"
+      tags:
+        - iterm2
+
+...

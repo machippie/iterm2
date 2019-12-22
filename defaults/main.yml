@@ -1,0 +1,10 @@
+# Standards: 0.1
+---
+# @var iterm_user:description: User to run user-specific commands
+# @var iterm_user:value: iterm_user | default(homebrew_user) | default(ansible_user_id)
+# iterm_user:
+
+# @var iterm_started:description: Restart app if already running
+iterm_started: False
+
+...
