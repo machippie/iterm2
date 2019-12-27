@@ -6,12 +6,6 @@
   tags:
     - iterm2
 
-- name: Install psutil package
-  pip:
-    name: psutil
-  tags:
-    - iterm2
-
 - become: "{{ (iterm_user != ansible_user_id) | bool }}"
   become_user: "{{ iterm_user }}"
   block:
@@ -34,16 +28,24 @@
       tags:
         - iterm2
 
+    - name: Install pidof package
+      homebrew:
+        name: pidof
+      tags:
+        - iterm2
+
     - name: Check program running
       register: iterm_running
-      pids:
-        name: iTerm
+      check_mode: False
+      failed_when: False
+      changed_when: iterm_running.stdout | length > 0 | bool
+      command: pidof iTerm
       tags:
         - iterm2
 
     - name: Fact program running
       set_fact:
-        iterm_started: "{{ iterm_running.pids | length > 0 }}}"
+        iterm_started: "{{ iterm_running.stdout_lines | length > 0 | bool }}"
       tags:
         - iterm2
 
