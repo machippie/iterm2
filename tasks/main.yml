@@ -39,7 +39,7 @@
       check_mode: False
       failed_when: False
       changed_when: iterm_running.stdout | length > 0 | bool
-      command: pidof iTerm
+      command: /usr/local/bin/pidof iTerm
       tags:
         - iterm2
 
