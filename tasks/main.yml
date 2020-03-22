@@ -20,33 +20,12 @@
       tags:
         - iterm2
 
-    - name: Remove quarantine flag
-      register: iterm_quarantine
-      failed_when: iterm_quarantine.rc != 0 and "No such xattr" not in iterm_quarantine.stderr
-      changed_when: iterm_quarantine.rc == 0
-      command: xattr -d com.apple.quarantine /Applications/iTerm.app
-      tags:
-        - iterm2
-
-    - name: Install pidof package
-      homebrew:
-        name: pidof
-      tags:
-        - iterm2
-
-    - name: Check program running
-      register: iterm_running
-      check_mode: False
-      failed_when: False
-      changed_when: iterm_running.stdout | length > 0 | bool
-      command: /usr/local/bin/pidof iTerm
-      tags:
-        - iterm2
-
-    - name: Fact program running
-      set_fact:
-        iterm_started: "{{ iterm_running.stdout_lines | length > 0 | bool }}"
-      tags:
-        - iterm2
+- name: Remove quarantine flag
+  register: iterm_quarantine
+  failed_when: iterm_quarantine.rc != 0 and "No such xattr" not in iterm_quarantine.stderr
+  changed_when: iterm_quarantine.rc == 0
+  command: xattr -d com.apple.quarantine /Applications/iTerm.app
+  tags:
+    - iterm2
 
 ...
